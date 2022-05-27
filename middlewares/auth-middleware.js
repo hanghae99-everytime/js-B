@@ -1,5 +1,5 @@
 const jwt = require('jsonwebtoken');
-const User = require('../schemas/user');
+const db = require('../DBindex');
 require('dotenv').config();
 
 module.exports = (req, res, next) => {
@@ -19,23 +19,22 @@ module.exports = (req, res, next) => {
     }
 
     try {
-        const { userID } = jwt.verify(
+        const { email } = jwt.verify(
             tokenValue,
             `${process.env.TOKEN_SECRET_KEY}`
         );
 
-        User.findOne({ userID })
+        db.query('select * from users where email=users.email')
             .exec()
             .then((user) => {
                 res.locals.user = user;
-
                 next();
             });
     } catch (error) {
         //jwt 토큰이 유효하지 않은 경우
         return res.status(401).json({
-            user: null,
-            errorMessage: '로그인 후 사용하시오',
+            result: false,
+            mag: '로그인 후 사용하시오',
         });
     }
 };
