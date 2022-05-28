@@ -24,7 +24,7 @@ module.exports = (req, res, next) => {
             `${process.env.TOKEN_SECRET_KEY}`
         );
 
-        db.query('select * from users where email=users.email')
+        db.query('select * from users where email=?', email)
             .exec()
             .then((user) => {
                 res.locals.user = user;

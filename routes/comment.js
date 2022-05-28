@@ -28,3 +28,5 @@ router.delete(
     authMiddleWare,
     commentController.deleteLike
 );
+
+module.exports = router;
