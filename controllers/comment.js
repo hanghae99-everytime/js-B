@@ -1,12 +1,12 @@
 require('dotenv').config();
 const db = require('../DBindex');
 
-exports.post = (req, res) => {
+exports.post = async (req, res) => {
     const { articleID } = req.params;
     const { content } = req.body;
     const { user } = res.locals;
     try {
-        db.query(
+        await db.query(
             'insert into comments(content, userID, articleID) values(?, ?, ?)',
             [content, user.id, articleID]
         );
@@ -22,10 +22,10 @@ exports.post = (req, res) => {
     }
 };
 
-exports.delete = (req, res) => {
+exports.delete = async (req, res) => {
     const { commentID } = req.params;
     try {
-        db.query('delete from comments where id=?', commentID);
+        await db.query('delete from comments where id=?', commentID);
         res.status(200).json({
             result: true,
             msg: '삭제가 완료되었습니다.',
@@ -38,11 +38,11 @@ exports.delete = (req, res) => {
     }
 };
 
-exports.patch = (req, res) => {
+exports.patch = async (req, res) => {
     const { commentID } = req.params;
     const { content } = req.body;
     try {
-        db.query('update comments set content=? where id=?', [
+        await db.query('update comments set content=? where id=?', [
             content,
             commentID,
         ]);
@@ -58,11 +58,11 @@ exports.patch = (req, res) => {
     }
 };
 
-exports.like = (req, res) => {
+exports.postLike = async (req, res) => {
     const { commentID } = req.params;
     const { user } = res.locals;
     try {
-        db.query('insert into likes(userID, commentID) values(?, ?)', [
+        await db.query('insert into likes(userID, commentID) values(?, ?)', [
             user.id,
             commentID,
         ]);
@@ -78,10 +78,10 @@ exports.like = (req, res) => {
     }
 };
 
-exports.deleteLike = (req, res) => {
+exports.deleteLike = async (req, res) => {
     const { commentID } = req.params;
     try {
-        db.query('delete from likes where commentID=?', commentID);
+        await db.query('delete from likes where commentID=?', commentID);
         res.status(200).json({
             result: true,
             msg: '좋아요 취소!',

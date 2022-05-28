@@ -14,6 +14,12 @@ app.use(express.urlencoded({ extended: true }));
 
 db.connect();
 
+// db.query('SELECT * FROM users', (error, result) => {
+//     if (error) return console.log(error, 'check');
+
+//     console.log(result);
+// });
+
 app.use(cors());
 
 app.use(

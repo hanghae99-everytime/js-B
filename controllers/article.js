@@ -31,7 +31,7 @@ exports.search = async (req, res) => {
     const { page, q } = req.query;
     const keyword = req.query.q.replace(/\s/gi, '');
     try {
-        const articles = db.query(
+        const articles = await db.query(
             'select A.title, A.content, B.image, C.count(*), D.count(*) from articles A left join images B on A.id=B.articleID left join likes C on A.id=C.articleID left join comments D on A.id=articleID where A.id ...? (A.title like "%?%" or A.content like "%?%") order by A.id desc limit 10',
             [page, keyword]
         );
@@ -47,20 +47,21 @@ exports.search = async (req, res) => {
 };
 
 // 게시글 작성, images 테이블에 articleID 추가 보완 필요
-exports.post = (req, res) => {
+exports.post = async (req, res) => {
     const { user } = res.locals;
     const { title, content } = req.body;
     try {
         if (req.file.location) {
-            db.query(
+            await db.query(
                 'insert into articles(title, content, userID, isImage) values(?, ?, ?, ?)',
                 [title, content, user.id, true]
             );
-            db.query('insert into images(image, articleID) values(?, ?)', [
-                req.file.location,
-            ]);
+            await db.query(
+                'insert into images(image, articleID) values(?, ?)',
+                [req.file.location]
+            );
         } else {
-            db.query(
+            await db.query(
                 'insert into articles(title, content, userID) values(?, ?, ?)',
                 [title, content, user.id]
             );
@@ -76,17 +77,17 @@ exports.post = (req, res) => {
 };
 
 // 게시글 상세 -> 보완 필요
-exports.showOne = (req, res) => {
+exports.showOne = async (req, res) => {
     const { articleID } = req.params;
     const article = db.query(
         'select A.id, A.title, A.content, A.userID, B.iamge, '
     );
 };
 
-exports.delete = (req, res) => {
+exports.delete = async (req, res) => {
     const { articleID } = req.params;
     try {
-        db.query('delete from articles where id=?', articleID);
+        await db.query('delete from articles where id=?', articleID);
         res.status(200).json({
             result: true,
             msg: '삭제가 완료되었습니다.',
@@ -107,11 +108,11 @@ exports.delete = (req, res) => {
 //     }
 // }
 
-exports.postLike = (req, res) => {
+exports.postLike = async (req, res) => {
     const { articleID } = req.params;
     const { user } = res.locals;
     try {
-        db.query('update likes set userID=? where articleID=?', [
+        await db.query('update likes set userID=? where articleID=?', [
             user.id,
             articleID,
         ]);
@@ -127,10 +128,13 @@ exports.postLike = (req, res) => {
     }
 };
 
-exports.deleteLike = (req, res) => {
+exports.deleteLike = async (req, res) => {
     const { articleID } = req.params;
     try {
-        db.query('update likes set userID=null where articleID=?', articleID);
+        await db.query(
+            'update likes set userID=null where articleID=?',
+            articleID
+        );
         res.status(200).json({
             result: true,
             msg: '좋아요 취소!',
@@ -143,10 +147,10 @@ exports.deleteLike = (req, res) => {
     }
 };
 
-exports.myLike = (req, res) => {
+exports.myLike = async (req, res) => {
     const { user } = res.locals;
     try {
-        const likes = db.query(
+        const likes = await db.query(
             'select A.count(*),B.title, B.content, B.isImage, C.count(*) from likes A left join articles B on A.userID=B.userID left join comments C on A.userID=C.userID where userID=?',
             user.id
         );
@@ -162,10 +166,10 @@ exports.myLike = (req, res) => {
     }
 };
 
-exports.myArticle = (req, res) => {
+exports.myArticle = async (req, res) => {
     const { user } = res.locals;
     try {
-        const articles = db.query(
+        const articles = await db.query(
             'select A.title, A.content, A.isImage, B.count(*),C.count(*) from articles A left join likes B on A.userID=B.userID left join comments C on A.userID=C.userID where userID=?',
             user.id
         );
