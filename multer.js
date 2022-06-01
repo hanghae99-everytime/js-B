@@ -1,32 +1,30 @@
 const multer = require('multer');
 const multerS3 = require('multer-s3');
 const aws = require('aws-sdk');
-
-const {
-    S3_ACCESS_KEY,
-    S3_SECRET_ACCESS_KEY,
-    S3_BUCKET_REGION,
-    S3_BUCKET_NAME,
-} = process.env;
+require('dotenv').config();
 
 const s3 = new aws.S3({
-    accessKeyId: S3_ACCESS_KEY,
-    secretAccessKey: S3_SECRET_ACCESS_KEY,
-    region: S3_BUCKET_REGION,
+    accessKeyId: process.env.S3_ACCESS_KEY,
+    secretAccessKey: process.env.S3_SECRET_ACCESS_KEY,
+    region: process.env.S3_BUCKET_REGION,
 });
+
+console.log('@@@@@@@@@@@@@@@@@', s3);
 
 const upload = multer({
     storage: multerS3({
         s3: s3,
-        bucket: S3_BUCKET_NAME,
+        bucket: process.env.S3_BUCKET_NAME,
         contentType: multerS3.AUTO_CONTENT_TYPE,
         acl: 'public-read',
-        key: function (req, file, cb) {
+        key: (req, file, cb) => {
+            console.log('file in multer', file);
             if (!file) next();
             else {
                 let arr = file.originalname.split('.');
+                console.log('arr', arr);
                 let ext = arr[arr.length - 1].trim().toLowerCase();
-
+                console.log('ext', ext);
                 if (
                     ext !== 'png' &&
                     ext !== 'gif' &&
@@ -34,7 +32,6 @@ const upload = multer({
                     ext !== 'jpeg'
                 )
                     return;
-
                 cb(
                     null,
                     Math.floor(Math.random() * 1000).toString() +

@@ -2,7 +2,7 @@ const express = require('express');
 const router = express.Router();
 const authMiddleWare = require('../middlewares/auth-middleware');
 const articleController = require('../controllers/article');
-const upload = require('../multer'); // post 할 때 이미지 여러 개 올리는 방법 보완 필요
+// const upload = require('../multer'); // post 할 때 이미지 여러 개 올리는 방법 보완 필요
 
 router.get('/articles/articleCount', articleController.totalCount);
 router.get('/articles', articleController.showTotal);
