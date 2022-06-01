@@ -32,5 +32,5 @@ app.use(
 app.use('/api', [articleRouter, commentRouter, userRouter]);
 
 app.listen(port, () => {
-    console.log('complete connect to server');
+    console.log(`complete connect to server`);
 });

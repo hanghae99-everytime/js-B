@@ -1,11 +1,12 @@
 require('dotenv').config();
 const cryptoJS = require('crypto-js');
+const nodemailer = require('node-mailer')
 const Joi = require('joi');
 const jwt = require('jsonwebtoken');
 const db = require('../DBindex');
 
 exports.signup = async (req, res) => {
-    console.log('req.file.location', req.file.location);
+    // console.log('req.file.location', req.file.location);
     try {
         // Joi
         const userSchema = Joi.object({
@@ -23,7 +24,6 @@ exports.signup = async (req, res) => {
             (error, result, field) => {
                 if (error) return console.log('query error', error);
                 if (result.length !== 0) {
-                    console.log('result in query', result);
                     return res.status(400).json({
                         result: false,
                         fail: '이미 존재하는 이메일입니다.',
@@ -35,38 +35,39 @@ exports.signup = async (req, res) => {
                         privateKey
                     ).toString();
 
-                    const EMAIL = process.env.EMAIL;
-                    const EMAIL_PASSWORD = process.env.PASSWORD;
+                    // const EMAIL = process.env.EMAIL;
+                    // const EMAIL_PASSWORD = process.env.PASSWORD;
 
-                    let receiverEmail = EMAIL;
-                    let mailOptions = ``;
+                    // let receiverEmail = EMAIL;
+                    // let mailOptions = ``;
 
-                    let transport = nodemailer.createTransport({
-                        service: 'gmail',
-                        auth: {
-                            user: EMAIL,
-                            pass: EMAIL_PASSWORD,
-                        },
-                    });
+                    // let transport = nodemailer.createTransport({
+                    //     service: 'gmail',
+                    //     auth: {
+                    //         user: EMAIL,
+                    //         pass: EMAIL_PASSWORD,
+                    //     },
+                    // });
 
-                    mailOptions = {
-                        from: EMAIL,
-                        to: receiverEmail,
-                        subject: 'everytime 인증 요청입니다.',
-                        text: `email은 ${result[0].email}, 
-                        파일은${req.file.location}`,
-                    };
+                    // mailOptions = {
+                    //     from: EMAIL,
+                    //     to: receiverEmail,
+                    //     subject: 'everytime 인증 요청입니다.',
+                    //     text: `email은 ${result[0].email}`
+                    // };
 
-                    transport.sendMail(mailOptions, (error, info) => {
-                        if (error) {
-                            console.log(error);
-                            return;
-                        }
-                    });
+                    // transport.sendMail(mailOptions, (error, info) => {
+                    //     if (error) {
+                    //         console.log(error);
+                    //         return;
+                    //     }
+                    // });
 
                     db.query(
-                        'insert into users (email, pwd, path) values(?, ?, ?)',
-                        [email, encryted, req.file.location]
+                        // 'insert into users (email, pwd, path) values(?, ?, ?)',
+                        'insert into users (email, pwd) values( ?, ?)',
+                        [email, encryted]
+                        // [email, encryted, req.file.location]
                     );
 
                     res.status(201).json({
