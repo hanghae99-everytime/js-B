@@ -1,6 +1,6 @@
 require('dotenv').config();
 const cryptoJS = require('crypto-js');
-const nodemailer = require('node-mailer')
+// const nodemailer = require('node-mailer')
 const Joi = require('joi');
 const jwt = require('jsonwebtoken');
 const db = require('../DBindex');
